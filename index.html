@@ -690,16 +690,60 @@
         btn.innerText = 'Buscando...';
 
         try {
-            // Query Supabase
-            // Supports case-insensitive searching in PostgreSQL using ilike
-            const { data, error } = await supabaseClient
-                .from('clientes')
-                .select('*')
-                .or(`Nombre.ilike.%${filtro}%,correo_electronico.ilike.%${filtro}%,Correo electrónico.ilike.%${filtro}%`);
+            // Robust query search with fallbacks to support different database schemas (PostgreSQL)
+            let result = null;
 
-            if (error) throw error;
+            // Attempt 1: Search using exact columns from user's schema (lowercase)
+            try {
+                result = await supabaseClient
+                    .from('clientes')
+                    .select('*')
+                    .or(`nombre.ilike.%${filtro}%,correo_electronico.ilike.%${filtro}%`);
+            } catch (e) {
+                console.warn("Attempt 1 failed", e);
+            }
 
-            loadedClientes = data || [];
+            // Attempt 2: Fallback to mixed-case, spaces (with quotes), and other variations
+            if (!result || result.error) {
+                try {
+                    result = await supabaseClient
+                        .from('clientes')
+                        .select('*')
+                        .or(`Nombre.ilike.%${filtro}%,"Correo electrónico".ilike.%${filtro}%,correo.ilike.%${filtro}%`);
+                } catch (e) {
+                    console.warn("Attempt 2 failed", e);
+                }
+            }
+
+            // Attempt 3: Fallback to just Name (capitalized)
+            if (!result || result.error) {
+                try {
+                    result = await supabaseClient
+                        .from('clientes')
+                        .select('*')
+                        .or(`Nombre.ilike.%${filtro}%`);
+                } catch (e) {
+                    console.warn("Attempt 3 failed", e);
+                }
+            }
+
+            // Attempt 4: Fallback to just name (lowercase)
+            if (!result || result.error) {
+                try {
+                    result = await supabaseClient
+                        .from('clientes')
+                        .select('*')
+                        .or(`nombre.ilike.%${filtro}%`);
+                } catch (e) {
+                    console.warn("Attempt 4 failed", e);
+                }
+            }
+
+            if (!result || result.error) {
+                throw (result ? result.error : new Error("No se pudo realizar la consulta con ningún esquema de columnas."));
+            }
+
+            loadedClientes = result.data || [];
 
             if (loadedClientes.length === 0) {
                 statusEl.className = 'alert alert-info';
