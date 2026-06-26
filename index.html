@@ -634,7 +634,9 @@
 
     // Default fallback credentials provided by user
     const DEFAULT_URL = 'https://jzqqcqmdusiocbhfdwmz.supabase.co';
-    const DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cXFjcW1kdXNpb2NiaGZkd216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NzkxNzQsImV4cCI6Mj    // Load saved config from LocalStorage or fallbacks
+    const DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cXFjcW1kdXNpb2NiaGZkd216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NzkxNzQsImV4cCI6MjA5ODA1NTE3NH0.5Ho469zgFXhaojOnvJzgwnykX3z3tyLAFzr1dZnGApY';
+
+    // Load saved config from LocalStorage or fallbacks
     function loadSavedConfig() {
         const url = localStorage.getItem('supabase_url') || DEFAULT_URL;
         const key = localStorage.getItem('supabase_key') || DEFAULT_KEY;
