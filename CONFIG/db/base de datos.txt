@@ -1,0 +1,52 @@
+--- MySql ---
+----- 1. Tabla: Cliente ---------
+CREATE TABLE `clientes` (
+  `IdCliente` int(11) NOT NULL,
+  `Nombre` varchar(255) DEFAULT NULL,
+  `Dirección` varchar(255) DEFAULT NULL,
+  `Teléfono` varchar(20) DEFAULT NULL,
+  `Correo electrónico` varchar(255) DEFAULT NULL
+) 
+
+
+CREATE TABLE `facturas` (
+  `IdFactura` int(11) NOT NULL,
+  `Fecha` date DEFAULT NULL,
+  `Total` decimal(10,2) DEFAULT NULL,
+  `IdCliente` int(11) DEFAULT NULL,
+  FOREIGN KEY (IdCliente) REFERENCES Facturas(IdClientea)
+) 
+
+CREATE TABLE Detalles_de_Productos (
+  IdDetalle INT PRIMARY KEY,
+  IdFactura INT,
+  IdProducto INT,
+  Cantidad INT,
+  Precio_unitario DECIMAL(10, 2),
+  FOREIGN KEY (IdFactura) REFERENCES Facturas(IdFactura),
+  FOREIGN KEY (IdProducto) REFERENCES Productos(IdProducto)
+);
+
+
+CREATE TABLE Pagos (
+  IdPago INT PRIMARY KEY,
+  IdFactura INT,
+  Fecha DATE,
+  Monto DECIMAL(10, 2),
+  FOREIGN KEY (`IdFactura`) REFERENCES `facturas` (`IdFactura`);
+)
+
+CREATE TABLE `productos` (
+  `IdProducto` int(11) NOT NULL,
+  `Nombre` varchar(255) DEFAULT NULL,
+  `Descripción` varchar(255) DEFAULT NULL,
+  `Precio` decimal(10,2) DEFAULT NULL
+)
+
+CREATE TABLE `stockproductos` (
+  `IdProducto` int(11) NOT NULL,
+  `CantidadEnStock` int(11) DEFAULT NULL,
+   FOREIGN KEY (`IdProducto`) REFERENCES `productos` (`IdProducto`);
+)
+
+
