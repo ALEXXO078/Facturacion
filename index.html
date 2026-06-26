@@ -405,38 +405,80 @@
 
         <!-- TAB 1: CLIENTES -->
         <div id="tab-clientes" class="tab-content active">
-            <form onsubmit="handleSearchClientes(event)">
-                <div class="form-group">
-                    <label for="search-filtro">Buscar por Nombre o Correo:</label>
-                    <div class="form-row">
-                        <input type="text" id="search-filtro" class="input-control" placeholder="Escribe el nombre o correo del cliente..." required>
-                        <button type="submit" class="btn" id="btn-search-clientes">Buscar</button>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 2.5rem;">
+                <!-- Formulario: Agregar Cliente -->
+                <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="margin-bottom: 1.25rem; color: var(--text-primary); font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                        👤 Agregar Nuevo Cliente
+                    </h3>
+                    <form onsubmit="handleAgregarCliente(event)" id="form-agregar-cliente">
+                        <div class="form-row" style="margin-bottom: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                                <label for="add-nombre">Nombre Completo *</label>
+                                <input type="text" id="add-nombre" class="input-control" placeholder="Ej. Juan Pérez" required>
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                                <label for="add-correo">Correo Electrónico *</label>
+                                <input type="email" id="add-correo" class="input-control" placeholder="Ej. juan@correo.com" required>
+                            </div>
+                        </div>
+                        <div class="form-row" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                                <label for="add-direccion">Dirección</label>
+                                <input type="text" id="add-direccion" class="input-control" placeholder="Ej. Calle Principal 123">
+                            </div>
+                            <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                                <label for="add-telefono">Teléfono</label>
+                                <input type="text" id="add-telefono" class="input-control" placeholder="Ej. 987654321">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="width: 100%;" id="btn-agregar-cliente">💾 Guardar Cliente</button>
+                    </form>
+                    <div id="agregar-status" class="alert" style="margin-top: 1rem; display: none;"></div>
+                </div>
+
+                <!-- Lista de Clientes -->
+                <div>
+                    <h3 style="margin-bottom: 1.25rem; color: var(--text-primary); font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                        📋 Lista y Búsqueda de Clientes
+                    </h3>
+                    <form onsubmit="handleSearchClientes(event)" style="margin-bottom: 1.5rem;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="search-filtro">Buscar por Nombre o Correo:</label>
+                            <div class="form-row" style="display: flex; gap: 1rem;">
+                                <input type="text" id="search-filtro" class="input-control" placeholder="Escribe para filtrar la lista..." style="flex: 1;">
+                                <button type="submit" class="btn" id="btn-search-clientes">Buscar</button>
+                                <button type="button" class="btn" style="background: rgba(255, 255, 255, 0.05); color: var(--text-primary);" onclick="fetchAllClientes()">Mostrar Todos</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div id="clientes-status" class="alert" style="display: none;"></div>
+
+                    <div id="clientes-results-container" class="results-container">
+                        <div class="action-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3>Clientes Registrados:</h3>
+                            <button class="btn btn-success" onclick="exportClientesPDF()">📄 Exportar PDF</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="table-clientes">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Dirección</th>
+                                        <th>Teléfono</th>
+                                        <th>Correo Electrónico</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-clientes">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem;">Cargando clientes...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            </form>
-
-            <div id="clientes-status" class="alert"></div>
-
-            <div id="clientes-results-container" class="results-container" style="display: none;">
-                <div class="action-header">
-                    <h3>Resultados de la búsqueda:</h3>
-                    <button class="btn btn-success" onclick="exportClientesPDF()">📄 Exportar PDF</button>
-                </div>
-                <div class="table-responsive">
-                    <table id="table-clientes">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Dirección</th>
-                                <th>Teléfono</th>
-                                <th>Correo Electrónico</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-clientes">
-                            <!-- JS injected rows -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
@@ -592,9 +634,7 @@
 
     // Default fallback credentials provided by user
     const DEFAULT_URL = 'https://jzqqcqmdusiocbhfdwmz.supabase.co';
-    const DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cXFjcW1kdXNpb2NiaGZkd216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NzkxNzQsImV4cCI6MjA5ODA1NTE3NH0.5Ho469zgFXhaojOnvJzgwnykX3z3tyLAFzr1dZnGApY';
-
-    // Load saved config from LocalStorage or fallbacks
+    const DEFAULT_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cXFjcW1kdXNpb2NiaGZkd216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0NzkxNzQsImV4cCI6Mj    // Load saved config from LocalStorage or fallbacks
     function loadSavedConfig() {
         const url = localStorage.getItem('supabase_url') || DEFAULT_URL;
         const key = localStorage.getItem('supabase_key') || DEFAULT_KEY;
@@ -607,6 +647,7 @@
                 // Initialize Supabase Client
                 supabaseClient = supabase.createClient(url, key);
                 document.getElementById('setup-banner').style.display = 'none';
+                fetchAllClientes(); // Load clients automatically
             } catch (err) {
                 console.error("Error inicializando Supabase:", err);
                 showBannerError("Error configurando el cliente de Supabase. Revisa las credenciales.");
@@ -648,6 +689,7 @@
             setTimeout(() => {
                 statusEl.style.display = 'none';
                 switchTab('tab-clientes');
+                fetchAllClientes(); // Fetch clients on connection
             }, 1500);
 
         } catch (err) {
@@ -666,16 +708,130 @@
         return '';
     }
 
+    // Render Clientes Table rows
+    function renderClientes(data) {
+        const tbody = document.getElementById('tbody-clientes');
+        tbody.innerHTML = '';
+        loadedClientes = data || [];
+
+        if (loadedClientes.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem;">No hay clientes registrados o que coincidan con la búsqueda.</td></tr>`;
+            return;
+        }
+
+        loadedClientes.forEach(row => {
+            const id = getProp(row, ['id_cliente', 'IdCliente', 'id']);
+            const nombre = getProp(row, ['nombre', 'Nombre']);
+            const direccion = getProp(row, ['direccion', 'Dirección', 'dirección']);
+            const telefono = getProp(row, ['telefono', 'Teléfono', 'teléfono']);
+            const correo = getProp(row, ['correo_electronico', 'Correo electrónico', 'correo']);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${id}</td>
+                <td><strong>${nombre}</strong></td>
+                <td>${direccion || '-'}</td>
+                <td>${telefono || '-'}</td>
+                <td>${correo || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Fetch all clients from database
+    async function fetchAllClientes() {
+        const statusEl = document.getElementById('clientes-status');
+        const tbody = document.getElementById('tbody-clientes');
+
+        if (!supabaseClient) return;
+
+        try {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem;">Cargando lista completa de clientes...</td></tr>`;
+            const { data, error } = await supabaseClient
+                .from('clientes')
+                .select('*')
+                .order('nombre', { ascending: true });
+
+            if (error) throw error;
+            renderClientes(data);
+        } catch (err) {
+            console.error("Error cargando clientes:", err);
+            statusEl.className = 'alert alert-error';
+            statusEl.innerText = 'Error al cargar clientes: ' + (err.message || err);
+            statusEl.style.display = 'block';
+        }
+    }
+
+    // Handle adding a new client
+    async function handleAgregarCliente(e) {
+        e.preventDefault();
+        const statusEl = document.getElementById('agregar-status');
+        statusEl.style.display = 'none';
+
+        if (!supabaseClient) {
+            statusEl.className = 'alert alert-error';
+            statusEl.innerText = 'Error: Primero debes configurar la conexión a Supabase.';
+            statusEl.style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('btn-agregar-cliente');
+        const nombre = document.getElementById('add-nombre').value.trim();
+        const correo = document.getElementById('add-correo').value.trim();
+        const direccion = document.getElementById('add-direccion').value.trim();
+        const telefono = document.getElementById('add-telefono').value.trim();
+
+        btn.disabled = true;
+        btn.innerText = 'Guardando...';
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('clientes')
+                .insert([
+                    {
+                        nombre: nombre,
+                        correo_electronico: correo,
+                        direccion: direccion || null,
+                        telefono: telefono || null
+                    }
+                ]);
+
+            if (error) throw error;
+
+            statusEl.className = 'alert alert-success';
+            statusEl.innerText = '¡Cliente guardado correctamente!';
+            statusEl.style.display = 'block';
+
+            // Clear form
+            document.getElementById('form-agregar-cliente').reset();
+
+            // Refresh table list
+            await fetchAllClientes();
+
+            // Hide success status after 3 seconds
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+
+        } catch (err) {
+            console.error("Error agregando cliente:", err);
+            statusEl.className = 'alert alert-error';
+            statusEl.innerText = 'Error al guardar el cliente: ' + (err.message || err);
+            statusEl.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '💾 Guardar Cliente';
+        }
+    }
+
     // Handle Client Search
     async function handleSearchClientes(e) {
         e.preventDefault();
         
         const statusEl = document.getElementById('clientes-status');
-        const resultsContainer = document.getElementById('clientes-results-container');
         const tbody = document.getElementById('tbody-clientes');
         
         statusEl.style.display = 'none';
-        resultsContainer.style.display = 'none';
 
         if (!supabaseClient) {
             statusEl.className = 'alert alert-error';
@@ -685,12 +841,16 @@
         }
 
         const filtro = document.getElementById('search-filtro').value.trim();
+        if (!filtro) {
+            fetchAllClientes();
+            return;
+        }
+
         const btn = document.getElementById('btn-search-clientes');
         btn.disabled = true;
         btn.innerText = 'Buscando...';
 
         try {
-            // Robust query search with fallbacks to support different database schemas (PostgreSQL)
             let result = null;
 
             // Attempt 1: Search using exact columns from user's schema (lowercase)
@@ -743,35 +903,7 @@
                 throw (result ? result.error : new Error("No se pudo realizar la consulta con ningún esquema de columnas."));
             }
 
-            loadedClientes = result.data || [];
-
-            if (loadedClientes.length === 0) {
-                statusEl.className = 'alert alert-info';
-                statusEl.innerText = 'No se encontraron clientes con ese criterio.';
-                statusEl.style.display = 'block';
-            } else {
-                // Populate Table
-                tbody.innerHTML = '';
-                loadedClientes.forEach(row => {
-                    // Casing adapters for properties to be bulletproof
-                    const id = getProp(row, ['IdCliente', 'id_cliente', 'id']);
-                    const nombre = getProp(row, ['Nombre', 'nombre']);
-                    const direccion = getProp(row, ['Dirección', 'direccion', 'dirección']);
-                    const telefono = getProp(row, ['Teléfono', 'telefono', 'teléfono']);
-                    const correo = getProp(row, ['Correo electrónico', 'correo_electronico', 'correo']);
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${id}</td>
-                        <td><strong>${nombre}</strong></td>
-                        <td>${direccion}</td>
-                        <td>${telefono}</td>
-                        <td>${correo}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                resultsContainer.style.display = 'block';
-            }
+            renderClientes(result.data);
         } catch (err) {
             console.error("Error buscando clientes:", err);
             statusEl.className = 'alert alert-error';
